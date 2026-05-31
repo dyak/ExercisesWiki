@@ -13,11 +13,6 @@
       --border: #2e3148;
       --text: #e2e4f0;
       --muted: #7a7e9a;
-      --tag-lower: #1e3a2f;        --tag-lower-text: #4ade80;
-      --tag-push:  #2a1e3a;        --tag-push-text:  #c084fc;
-      --tag-pull:  #1e2a3a;        --tag-pull-text:  #60a5fa;
-      --tag-shoulder: #3a2a1e;     --tag-shoulder-text: #fb923c;
-      --tag-core: #3a1e1e;         --tag-core-text: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,23 +21,23 @@
       color: var(--text);
       min-height: 100vh;
     }
+
     header {
       padding: 40px 24px 24px;
       border-bottom: 1px solid var(--border);
-      max-width: 900px;
+      max-width: 860px;
       margin: 0 auto;
     }
     header h1 { font-size: 28px; font-weight: 700; color: #fff; }
     header p  { color: var(--muted); margin-top: 6px; font-size: 14px; }
 
     .controls {
-      max-width: 900px;
+      max-width: 860px;
       margin: 24px auto 0;
       padding: 0 24px;
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      align-items: center;
     }
     .search-box {
       flex: 1; min-width: 200px;
@@ -56,7 +51,6 @@
       transition: border-color .2s;
     }
     .search-box:focus { border-color: var(--accent); }
-
     .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
     .filter-btn {
       padding: 8px 16px;
@@ -75,386 +69,515 @@
     }
 
     .content {
-      max-width: 900px;
+      max-width: 860px;
       margin: 32px auto 80px;
       padding: 0 24px;
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 36px;
     }
 
-    .category { }
+    /* Category section */
+    .category.hidden { display: none; }
     .category-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
-    .category-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-    }
+    .category-title { font-size: 18px; font-weight: 700; color: #fff; }
     .category-count {
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 12px; color: var(--muted);
       background: var(--surface2);
-      padding: 2px 8px;
-      border-radius: 20px;
+      padding: 2px 8px; border-radius: 20px;
     }
+    .exercise-list { display: flex; flex-direction: column; gap: 6px; }
 
-    .exercise-list {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    /* Exercise card */
+    .exercise-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color .2s;
+      scroll-margin-top: 80px;
     }
-    .exercise-row {
+    .exercise-card:hover { border-color: #3e4460; }
+    .exercise-card.open  { border-color: var(--accent); }
+    .exercise-card.hidden { display: none; }
+
+    /* Card header — always visible */
+    .card-header {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      background: var(--surface);
-      border: 1px solid transparent;
-      transition: border-color .2s, background .2s;
-      cursor: default;
+      gap: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
     }
-    .exercise-row:hover {
-      border-color: var(--border);
-      background: var(--surface2);
-    }
-    .exercise-row.hidden { display: none; }
-
+    .card-header:hover { background: var(--surface2); }
     .exercise-name {
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 600;
       flex: 1;
+      color: #fff;
     }
-    .exercise-meta {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .exercise-cues {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+    .card-meta { font-size: 13px; color: var(--muted); }
+    .card-cues { display: flex; gap: 5px; flex-wrap: wrap; }
     .cue {
       font-size: 11px;
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 5px;
       padding: 2px 7px;
       color: var(--muted);
     }
-    .tag {
-      font-size: 11px; font-weight: 600;
-      padding: 3px 8px; border-radius: 6px;
-      white-space: nowrap; text-transform: uppercase; letter-spacing: .4px;
-    }
-    .tag-lower    { background: var(--tag-lower);    color: var(--tag-lower-text); }
-    .tag-chest    { background: var(--tag-push);     color: var(--tag-push-text); }
-    .tag-arms     { background: var(--tag-shoulder); color: var(--tag-shoulder-text); }
-    .tag-core     { background: var(--tag-core);     color: var(--tag-core-text); }
-
-    .video-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: #e00;
-      color: #fff;
+    .anchor-btn {
+      font-size: 15px;
+      color: var(--muted);
       text-decoration: none;
-      font-size: 11px;
+      opacity: .5;
+      transition: opacity .2s;
       flex-shrink: 0;
-      transition: background .2s, transform .2s;
     }
-    .video-link:hover { background: #ff3333; transform: scale(1.1); }
+    .anchor-btn:hover { opacity: 1; color: var(--accent); }
+    .chevron {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      color: var(--muted);
+      transition: transform .25s;
+    }
+    .exercise-card.open .chevron { transform: rotate(180deg); }
 
-    .exercise-row--video {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0;
-      padding: 0;
+    /* Collapsible body */
+    .card-body {
+      max-height: 0;
       overflow: hidden;
+      transition: max-height .3s ease;
     }
-    .exercise-video-wrap {
+    .exercise-card.open .card-body {
+      max-height: 2000px;
+    }
+    .card-body-inner {
+      border-top: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Videos grid */
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .video-item { display: flex; flex-direction: column; gap: 6px; }
+    .video-title { font-size: 12px; color: var(--muted); padding-left: 2px; }
+    .video-wrap {
       position: relative;
       width: 100%;
       padding-top: 56.25%;
       background: #000;
+      border-radius: 8px;
+      overflow: hidden;
     }
-    .exercise-video-wrap iframe {
+    .video-wrap iframe {
       position: absolute;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       border: none;
     }
-    .exercise-info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      flex-wrap: wrap;
-    }
-    .exercise-info .exercise-name { flex: 1; }
-    .divider {
-      width: 100%; height: 1px;
-      background: var(--border);
-      margin: 0;
-    }
 
-    .category.hidden { display: none; }
+    .divider { width: 100%; height: 1px; background: var(--border); }
+
+    /* Highlight on anchor jump */
+    .exercise-card:target {
+      border-color: var(--accent);
+      animation: highlight .8s ease;
+    }
+    @keyframes highlight {
+      0%   { box-shadow: 0 0 0 3px rgba(92,110,248,.5); }
+      100% { box-shadow: none; }
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>💪 Exercise Library</h1>
-  <p>All exercises from the programme — grouped by muscle group</p>
+  <p>All exercises grouped by muscle group — click to expand technique videos</p>
 </header>
 
 <div class="controls">
   <input class="search-box" type="text" placeholder="Search exercises..." oninput="filterCards()" id="search" />
   <div class="filter-btns">
-    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-    <button class="filter-btn" onclick="setFilter('legs', this)">🦵 Legs</button>
-    <button class="filter-btn" onclick="setFilter('chest', this)">🏋️ Chest & Back</button>
-    <button class="filter-btn" onclick="setFilter('arms', this)">🔱 Arms & Shoulders</button>
-    <button class="filter-btn" onclick="setFilter('core', this)">🔥 Core</button>
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('legs',this)">🦵 Legs</button>
+    <button class="filter-btn" onclick="setFilter('chest',this)">🏋️ Chest & Back</button>
+    <button class="filter-btn" onclick="setFilter('arms',this)">🔱 Arms & Shoulders</button>
+    <button class="filter-btn" onclick="setFilter('core',this)">🔥 Core</button>
   </div>
 </div>
 
-<div class="content" id="content">
+<div class="content">
 
-  <!-- LEGS -->
+  <!-- ═══ LEGS ═══ -->
   <div class="category" data-cat="legs" id="cat-legs">
     <div class="category-header">
       <span class="category-title">🦵 Legs</span>
       <span class="category-count" id="count-legs"></span>
     </div>
     <div class="exercise-list">
-      <div class="exercise-row exercise-row--video" data-cat="legs" data-name="barbell back squat">
-        <div class="exercise-video-wrap">
-          <iframe src="https://www.youtube.com/embed/PPmvh7gBTi0" loading="lazy" allowfullscreen title="Barbell Back Squat"></iframe>
-        </div>
-        <div class="exercise-info">
+
+      <div class="exercise-card" id="squat" data-cat="legs" data-name="barbell back squat">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
           <span class="exercise-name">Barbell Back Squat</span>
-          <div class="exercise-cues">
+          <div class="card-cues">
             <span class="cue">Chest proud</span>
             <span class="cue">Knees track toes</span>
             <span class="cue">Hip crease below knee</span>
           </div>
-          <span class="exercise-meta">52.5 kg × 4×8</span>
+          <span class="card-meta">52.5 kg × 4×8</span>
+          <a class="anchor-btn" href="#squat" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="card-body">
+          <div class="card-body-inner">
+            <div class="videos-grid">
+              <div class="video-item">
+                <span class="video-title">Technique overview</span>
+                <div class="video-wrap">
+                  <iframe src="https://www.youtube.com/embed/PPmvh7gBTi0" loading="lazy" allowfullscreen></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="exercise-row" data-cat="legs" data-name="romanian deadlift rdl">
-        <span class="exercise-name">Romanian Deadlift</span>
-        <div class="exercise-cues">
-          <span class="cue">Hinge from hips</span>
-          <span class="cue">Neutral spine</span>
-          <span class="cue">Bar close to legs</span>
+
+      <div class="exercise-card" id="rdl" data-cat="legs" data-name="romanian deadlift rdl">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Romanian Deadlift</span>
+          <div class="card-cues">
+            <span class="cue">Hinge from hips</span>
+            <span class="cue">Neutral spine</span>
+            <span class="cue">Bar close to legs</span>
+          </div>
+          <span class="card-meta">55 kg × 5×8</span>
+          <a class="anchor-btn" href="#rdl" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">55 kg × 5×8</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="legs" data-name="bulgarian split squat">
-        <span class="exercise-name">Bulgarian Split Squat</span>
-        <div class="exercise-cues">
-          <span class="cue">Front foot forward</span>
-          <span class="cue">Torso upright</span>
-          <span class="cue">Drive through heel</span>
+
+      <div class="exercise-card" id="split-squat" data-cat="legs" data-name="bulgarian split squat">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Bulgarian Split Squat</span>
+          <div class="card-cues">
+            <span class="cue">Front foot forward</span>
+            <span class="cue">Torso upright</span>
+            <span class="cue">Drive through heel</span>
+          </div>
+          <span class="card-meta">15 kg × 4×20</span>
+          <a class="anchor-btn" href="#split-squat" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">15 kg × 4×20</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="legs" data-name="leg press">
-        <span class="exercise-name">Leg Press</span>
-        <div class="exercise-cues">
-          <span class="cue">Full depth</span>
-          <span class="cue">Don't lock knees</span>
-          <span class="cue">Feet hip-width</span>
+
+      <div class="exercise-card" id="leg-press" data-cat="legs" data-name="leg press">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Leg Press</span>
+          <div class="card-cues">
+            <span class="cue">Full depth</span>
+            <span class="cue">Don't lock knees</span>
+            <span class="cue">Feet hip-width</span>
+          </div>
+          <span class="card-meta">100 kg × 3×10</span>
+          <a class="anchor-btn" href="#leg-press" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">100 kg × 3×10</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="legs" data-name="leg curl">
-        <span class="exercise-name">Leg Curl</span>
-        <div class="exercise-cues">
-          <span class="cue">Full ROM</span>
-          <span class="cue">Control eccentric</span>
-          <span class="cue">Hips stay down</span>
+
+      <div class="exercise-card" id="leg-curl" data-cat="legs" data-name="leg curl">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Leg Curl</span>
+          <div class="card-cues">
+            <span class="cue">Full ROM</span>
+            <span class="cue">Control eccentric</span>
+            <span class="cue">Hips stay down</span>
+          </div>
+          <span class="card-meta">55 kg × 3×12</span>
+          <a class="anchor-btn" href="#leg-curl" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">55 kg × 3×12</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="legs" data-name="calf raise">
-        <span class="exercise-name">Calf Raise</span>
-        <div class="exercise-cues">
-          <span class="cue">Full stretch at bottom</span>
-          <span class="cue">Pause at top</span>
+
+      <div class="exercise-card" id="calf-raise" data-cat="legs" data-name="calf raise">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Calf Raise</span>
+          <div class="card-cues">
+            <span class="cue">Full stretch at bottom</span>
+            <span class="cue">Pause at top</span>
+          </div>
+          <span class="card-meta">80 kg × 3×10</span>
+          <a class="anchor-btn" href="#calf-raise" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">80 kg × 3×10</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="legs" data-name="reverse hyper hyperextension">
-        <span class="exercise-name">Reverse Hyper</span>
-        <div class="exercise-cues">
-          <span class="cue">Controlled swing</span>
-          <span class="cue">Squeeze glutes at top</span>
+
+      <div class="exercise-card" id="reverse-hyper" data-cat="legs" data-name="reverse hyper hyperextension">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Reverse Hyper</span>
+          <div class="card-cues">
+            <span class="cue">Controlled swing</span>
+            <span class="cue">Squeeze glutes at top</span>
+          </div>
+          <span class="card-meta">15 kg × 3×12</span>
+          <a class="anchor-btn" href="#reverse-hyper" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">15 kg × 3×12</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
+
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- CHEST & BACK -->
+  <!-- ═══ CHEST & BACK ═══ -->
   <div class="category" data-cat="chest" id="cat-chest">
     <div class="category-header">
       <span class="category-title">🏋️ Chest & Back</span>
       <span class="category-count" id="count-chest"></span>
     </div>
     <div class="exercise-list">
-      <div class="exercise-row" data-cat="chest" data-name="barbell bench press">
-        <span class="exercise-name">Barbell Bench Press</span>
-        <div class="exercise-cues">
-          <span class="cue">Arch upper back</span>
-          <span class="cue">Bar to lower chest</span>
-          <span class="cue">Drive through heels</span>
+
+      <div class="exercise-card" id="bench-press" data-cat="chest" data-name="barbell bench press">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Barbell Bench Press</span>
+          <div class="card-cues">
+            <span class="cue">Arch upper back</span>
+            <span class="cue">Bar to lower chest</span>
+            <span class="cue">Drive through heels</span>
+          </div>
+          <span class="card-meta">50 kg × 4×8</span>
+          <a class="anchor-btn" href="#bench-press" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">50 kg × 4×8</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="chest" data-name="incline dumbbell press">
-        <span class="exercise-name">Incline Dumbbell Press</span>
-        <div class="exercise-cues">
-          <span class="cue">30–45° incline</span>
-          <span class="cue">Elbows at 45°</span>
-          <span class="cue">Full stretch</span>
+
+      <div class="exercise-card" id="incline-db" data-cat="chest" data-name="incline dumbbell press">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Incline Dumbbell Press</span>
+          <div class="card-cues">
+            <span class="cue">30–45° incline</span>
+            <span class="cue">Elbows at 45°</span>
+            <span class="cue">Full stretch</span>
+          </div>
+          <span class="card-meta">15 kg × 3×10</span>
+          <a class="anchor-btn" href="#incline-db" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">15 kg × 3×10</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="chest" data-name="lat pulldown">
-        <span class="exercise-name">Lat Pulldown</span>
-        <div class="exercise-cues">
-          <span class="cue">Lead with elbows</span>
-          <span class="cue">Slight lean back</span>
-          <span class="cue">Squeeze lats at bottom</span>
+
+      <div class="exercise-card" id="lat-pulldown" data-cat="chest" data-name="lat pulldown">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Lat Pulldown</span>
+          <div class="card-cues">
+            <span class="cue">Lead with elbows</span>
+            <span class="cue">Slight lean back</span>
+            <span class="cue">Squeeze lats</span>
+          </div>
+          <span class="card-meta">52 kg × 3×10</span>
+          <a class="anchor-btn" href="#lat-pulldown" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">52 kg × 3×10</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="chest" data-name="cable row seated">
-        <span class="exercise-name">Cable Row</span>
-        <div class="exercise-cues">
-          <span class="cue">Chest proud</span>
-          <span class="cue">Elbows close to body</span>
-          <span class="cue">Squeeze scapula</span>
+
+      <div class="exercise-card" id="cable-row" data-cat="chest" data-name="cable row seated">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Cable Row</span>
+          <div class="card-cues">
+            <span class="cue">Chest proud</span>
+            <span class="cue">Elbows close to body</span>
+            <span class="cue">Squeeze scapula</span>
+          </div>
+          <span class="card-meta">52 kg × 3×12</span>
+          <a class="anchor-btn" href="#cable-row" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">52 kg × 3×12</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="chest" data-name="pull-up pullup">
-        <span class="exercise-name">Pull-up</span>
-        <div class="exercise-cues">
-          <span class="cue">Dead hang start</span>
-          <span class="cue">Lead with chest</span>
-          <span class="cue">Full extension</span>
+
+      <div class="exercise-card" id="pullup" data-cat="chest" data-name="pull-up pullup">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Pull-up</span>
+          <div class="card-cues">
+            <span class="cue">Dead hang start</span>
+            <span class="cue">Lead with chest</span>
+            <span class="cue">Full extension</span>
+          </div>
+          <span class="card-meta">Bodyweight × 4×10</span>
+          <a class="anchor-btn" href="#pullup" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">Bodyweight × 4×10</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
+
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- ARMS & SHOULDERS -->
+  <!-- ═══ ARMS & SHOULDERS ═══ -->
   <div class="category" data-cat="arms" id="cat-arms">
     <div class="category-header">
       <span class="category-title">🔱 Arms & Shoulders</span>
       <span class="category-count" id="count-arms"></span>
     </div>
     <div class="exercise-list">
-      <div class="exercise-row" data-cat="arms" data-name="shoulder press overhead dumbbell">
-        <span class="exercise-name">Dumbbell Shoulder Press</span>
-        <div class="exercise-cues">
-          <span class="cue">Elbows at 90°</span>
-          <span class="cue">No excessive lean</span>
-          <span class="cue">Full lockout</span>
+
+      <div class="exercise-card" id="shoulder-press" data-cat="arms" data-name="shoulder press overhead dumbbell">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Dumbbell Shoulder Press</span>
+          <div class="card-cues">
+            <span class="cue">Elbows at 90°</span>
+            <span class="cue">No excessive lean</span>
+            <span class="cue">Full lockout</span>
+          </div>
+          <span class="card-meta">15 kg × 4×8</span>
+          <a class="anchor-btn" href="#shoulder-press" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">15 kg × 4×8</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="arms" data-name="lateral raise side delt">
-        <span class="exercise-name">Lateral Raise</span>
-        <div class="exercise-cues">
-          <span class="cue">Slight forward lean</span>
-          <span class="cue">Pinky up at top</span>
-          <span class="cue">Slow eccentric</span>
+
+      <div class="exercise-card" id="lateral-raise" data-cat="arms" data-name="lateral raise side delt">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Lateral Raise</span>
+          <div class="card-cues">
+            <span class="cue">Slight forward lean</span>
+            <span class="cue">Pinky up at top</span>
+            <span class="cue">Slow eccentric</span>
+          </div>
+          <span class="card-meta">7 kg × 4×12</span>
+          <a class="anchor-btn" href="#lateral-raise" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">7 kg × 4×12</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="arms" data-name="bicep curl">
-        <span class="exercise-name">Bicep Curl</span>
-        <div class="exercise-cues">
-          <span class="cue">No swing</span>
-          <span class="cue">Supinate at top</span>
-          <span class="cue">Full extension</span>
+
+      <div class="exercise-card" id="bicep-curl" data-cat="arms" data-name="bicep curl">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Bicep Curl</span>
+          <div class="card-cues">
+            <span class="cue">No swing</span>
+            <span class="cue">Supinate at top</span>
+            <span class="cue">Full extension</span>
+          </div>
+          <span class="card-meta">—</span>
+          <a class="anchor-btn" href="#bicep-curl" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">—</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="arms" data-name="tricep pushdown extension">
-        <span class="exercise-name">Tricep Pushdown</span>
-        <div class="exercise-cues">
-          <span class="cue">Elbows pinned</span>
-          <span class="cue">Full lockout</span>
-          <span class="cue">Control return</span>
+
+      <div class="exercise-card" id="tricep-pushdown" data-cat="arms" data-name="tricep pushdown extension">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Tricep Pushdown</span>
+          <div class="card-cues">
+            <span class="cue">Elbows pinned</span>
+            <span class="cue">Full lockout</span>
+            <span class="cue">Control return</span>
+          </div>
+          <span class="card-meta">—</span>
+          <a class="anchor-btn" href="#tricep-pushdown" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">—</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
+
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- CORE -->
+  <!-- ═══ CORE ═══ -->
   <div class="category" data-cat="core" id="cat-core">
     <div class="category-header">
       <span class="category-title">🔥 Core</span>
       <span class="category-count" id="count-core"></span>
     </div>
     <div class="exercise-list">
-      <div class="exercise-row" data-cat="core" data-name="crunch weighted cable">
-        <span class="exercise-name">Crunch (weighted)</span>
-        <div class="exercise-cues">
-          <span class="cue">Round lower back</span>
-          <span class="cue">Exhale on contraction</span>
-          <span class="cue">No neck pull</span>
+
+      <div class="exercise-card" id="crunch" data-cat="core" data-name="crunch weighted cable">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Crunch (weighted)</span>
+          <div class="card-cues">
+            <span class="cue">Round lower back</span>
+            <span class="cue">Exhale on contraction</span>
+            <span class="cue">No neck pull</span>
+          </div>
+          <span class="card-meta">5 kg × 3×15</span>
+          <a class="anchor-btn" href="#crunch" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">5 kg × 3×15</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="core" data-name="leg raises hanging">
-        <span class="exercise-name">Leg Raises</span>
-        <div class="exercise-cues">
-          <span class="cue">Posterior pelvic tilt</span>
-          <span class="cue">Slow lower</span>
-          <span class="cue">Don't swing</span>
+
+      <div class="exercise-card" id="leg-raises" data-cat="core" data-name="leg raises hanging">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Leg Raises</span>
+          <div class="card-cues">
+            <span class="cue">Posterior pelvic tilt</span>
+            <span class="cue">Slow lower</span>
+            <span class="cue">Don't swing</span>
+          </div>
+          <span class="card-meta">3×15</span>
+          <a class="anchor-btn" href="#leg-raises" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">3×15</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="core" data-name="dead bug">
-        <span class="exercise-name">Dead Bug</span>
-        <div class="exercise-cues">
-          <span class="cue">Lower back pressed down</span>
-          <span class="cue">Breathe out while lowering</span>
-          <span class="cue">Slow & controlled</span>
+
+      <div class="exercise-card" id="dead-bug" data-cat="core" data-name="dead bug">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Dead Bug</span>
+          <div class="card-cues">
+            <span class="cue">Lower back pressed down</span>
+            <span class="cue">Breathe out while lowering</span>
+            <span class="cue">Slow & controlled</span>
+          </div>
+          <span class="card-meta">3×10/side</span>
+          <a class="anchor-btn" href="#dead-bug" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">3×10/side</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
-      <div class="exercise-row" data-cat="core" data-name="plank">
-        <span class="exercise-name">Plank</span>
-        <div class="exercise-cues">
-          <span class="cue">Neutral spine</span>
-          <span class="cue">Brace core</span>
-          <span class="cue">Don't hold breath</span>
+
+      <div class="exercise-card" id="plank" data-cat="core" data-name="plank">
+        <div class="card-header" onclick="toggleCard(this.parentElement)">
+          <span class="exercise-name">Plank</span>
+          <div class="card-cues">
+            <span class="cue">Neutral spine</span>
+            <span class="cue">Brace core</span>
+            <span class="cue">Don't hold breath</span>
+          </div>
+          <span class="card-meta">3×45s</span>
+          <a class="anchor-btn" href="#plank" onclick="event.stopPropagation()" title="Copy link">#</a>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <span class="exercise-meta">3×45s</span>
+        <div class="card-body"><div class="card-body-inner"><p style="color:var(--muted);font-size:13px">No videos yet</p></div></div>
       </div>
+
     </div>
   </div>
 
@@ -462,6 +585,21 @@
 
 <script>
 let activeFilter = 'all';
+
+function toggleCard(card) {
+  card.classList.toggle('open');
+}
+
+// Auto-open card if URL has anchor
+function openFromHash() {
+  const id = location.hash.slice(1);
+  if (id) {
+    const card = document.getElementById(id);
+    if (card && card.classList.contains('exercise-card')) {
+      card.classList.add('open');
+    }
+  }
+}
 
 function setFilter(cat, btn) {
   activeFilter = cat;
@@ -472,36 +610,29 @@ function setFilter(cat, btn) {
 
 function filterCards() {
   const q = document.getElementById('search').value.toLowerCase();
-
   ['legs','chest','arms','core'].forEach(cat => {
     const catEl = document.getElementById('cat-' + cat);
-    const rows = catEl.querySelectorAll('.exercise-row');
+    const cards = catEl.querySelectorAll('.exercise-card');
     let visible = 0;
-
-    rows.forEach(row => {
-      const matchCat = activeFilter === 'all' || row.dataset.cat === activeFilter;
-      const matchSearch = !q || row.dataset.name.includes(q) ||
-        row.querySelector('.exercise-name').textContent.toLowerCase().includes(q);
+    cards.forEach(card => {
+      const matchCat = activeFilter === 'all' || card.dataset.cat === activeFilter;
+      const matchSearch = !q ||
+        card.dataset.name.includes(q) ||
+        card.querySelector('.exercise-name').textContent.toLowerCase().includes(q);
       const show = matchCat && matchSearch;
-      row.classList.toggle('hidden', !show);
+      card.classList.toggle('hidden', !show);
       if (show) visible++;
     });
-
-    // hide whole category if nothing matches
     const hide = (activeFilter !== 'all' && activeFilter !== cat) || visible === 0;
     catEl.classList.toggle('hidden', hide);
-
-    // hide divider after hidden category
-    const divider = catEl.nextElementSibling;
-    if (divider && divider.classList.contains('divider')) {
-      divider.classList.toggle('hidden', hide);
-    }
-
+    const div = catEl.nextElementSibling;
+    if (div && div.classList.contains('divider')) div.classList.toggle('hidden', hide);
     document.getElementById('count-' + cat).textContent = visible + ' exercises';
   });
 }
 
-// init counts
+window.addEventListener('hashchange', openFromHash);
+openFromHash();
 filterCards();
 </script>
 
