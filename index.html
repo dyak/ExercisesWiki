@@ -157,6 +157,20 @@
     .tag-arms     { background: var(--tag-shoulder); color: var(--tag-shoulder-text); }
     .tag-core     { background: var(--tag-core);     color: var(--tag-core-text); }
 
+    .video-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #e00;
+      color: #fff;
+      text-decoration: none;
+      font-size: 11px;
+      flex-shrink: 0;
+      transition: background .2s, transform .2s;
+    }
+    .video-link:hover { background: #ff3333; transform: scale(1.1); }
     .divider {
       width: 100%; height: 1px;
       background: var(--border);
@@ -195,6 +209,7 @@
     <div class="exercise-list">
       <div class="exercise-row" data-cat="legs" data-name="barbell back squat">
         <span class="exercise-name">Barbell Back Squat</span>
+        <a href="https://youtube.com/shorts/PPmvh7gBTi0" target="_blank" class="video-link" title="Watch technique video">▶</a>
         <div class="exercise-cues">
           <span class="cue">Chest proud</span>
           <span class="cue">Knees track toes</span>
