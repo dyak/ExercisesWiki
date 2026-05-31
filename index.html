@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise Library</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222638;
+      --accent: #5c6ef8;
+      --accent2: #7b8cff;
+      --text: #e2e4f0;
+      --muted: #7a7e9a;
+      --border: #2e3148;
+      --tag-lower: #1e3a2f;
+      --tag-lower-text: #4ade80;
+      --tag-push: #2a1e3a;
+      --tag-push-text: #c084fc;
+      --tag-pull: #1e2a3a;
+      --tag-pull-text: #60a5fa;
+      --tag-shoulder: #3a2a1e;
+      --tag-shoulder-text: #fb923c;
+      --tag-core: #3a1e1e;
+      --tag-core-text: #f87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 32px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    header p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 14px;
+    }
+    .controls {
+      max-width: 1100px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-box:focus { border-color: var(--accent); }
+    .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .grid {
+      max-width: 1100px;
+      margin: 28px auto 60px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform .2s, border-color .2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+    }
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .no-video {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: 13px;
+      gap: 8px;
+    }
+    .no-video svg { opacity: .4; }
+    .card-body { padding: 16px; }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #fff; }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .tag-lower  { background: var(--tag-lower);    color: var(--tag-lower-text); }
+    .tag-push   { background: var(--tag-push);     color: var(--tag-push-text); }
+    .tag-pull   { background: var(--tag-pull);     color: var(--tag-pull-text); }
+    .tag-shoulder { background: var(--tag-shoulder); color: var(--tag-shoulder-text); }
+    .tag-core   { background: var(--tag-core);     color: var(--tag-core-text); }
+    .card-notes { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .card-cues { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .cue {
+      font-size: 11px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      color: var(--muted);
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💪 Exercise Library</h1>
+  <p>Technique videos & coaching cues for every exercise in the programme</p>
+</header>
+
+<div class="controls">
+  <input class="search-box" type="text" placeholder="Search exercises..." oninput="filterCards()" id="search" />
+  <div class="filter-btns">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('lower', this)">🦵 Lower</button>
+    <button class="filter-btn" onclick="setFilter('push', this)">🏋️ Push</button>
+    <button class="filter-btn" onclick="setFilter('pull', this)">💪 Pull</button>
+    <button class="filter-btn" onclick="setFilter('shoulder', this)">🔱 Shoulders</button>
+    <button class="filter-btn" onclick="setFilter('core', this)">🔥 Core</button>
+  </div>
+</div>
+
+<div class="grid" id="grid">
+
+  <!-- LOWER BODY -->
+  <div class="card" data-category="lower" data-name="barbell back squat">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/ultWZbUMPL8" loading="lazy" allowfullscreen title="Barbell Back Squat"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Barbell Back Squat</span>
+        <span class="tag tag-lower">Lower</span>
+      </div>
+      <p class="card-notes">Core compound lift. 52.5 kg × 4×8</p>
+      <div class="card-cues">
+        <span class="cue">Chest proud</span>
+        <span class="cue">Knees track toes</span>
+        <span class="cue">Brace core</span>
+        <span class="cue">Hip crease below knee</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="lower" data-name="romanian deadlift rdl">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/JCXUYuzwNrM" loading="lazy" allowfullscreen title="Romanian Deadlift"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Romanian Deadlift</span>
+        <span class="tag tag-lower">Lower</span>
+      </div>
+      <p class="card-notes">Posterior chain. 55 kg × 5×8</p>
+      <div class="card-cues">
+        <span class="cue">Hinge from hips</span>
+        <span class="cue">Neutral spine</span>
+        <span class="cue">Bar close to legs</span>
+        <span class="cue">Soft knees</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="lower" data-name="bulgarian split squat">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/2C-uNgKwPLE" loading="lazy" allowfullscreen title="Bulgarian Split Squat"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Bulgarian Split Squat</span>
+        <span class="tag tag-lower">Lower</span>
+      </div>
+      <p class="card-notes">Unilateral balance & ski prep. 15 kg × 4×20</p>
+      <div class="card-cues">
+        <span class="cue">Front foot forward</span>
+        <span class="cue">Torso upright</span>
+        <span class="cue">Drive through heel</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="lower" data-name="leg press">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/IZxyjW7MPJQ" loading="lazy" allowfullscreen title="Leg Press"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Leg Press</span>
+        <span class="tag tag-lower">Lower</span>
+      </div>
+      <p class="card-notes">100 kg × 3×10</p>
+      <div class="card-cues">
+        <span class="cue">Full depth</span>
+        <span class="cue">Don't lock knees</span>
+        <span class="cue">Feet hip-width</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="lower" data-name="leg curl">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/1Tq3QdYUuHs" loading="lazy" allowfullscreen title="Leg Curl"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Leg Curl</span>
+        <span class="tag tag-lower">Lower</span>
+      </div>
+      <p class="card-notes">Hamstring isolation. 55 kg × 3×12</p>
+      <div class="card-cues">
+        <span class="cue">Full ROM</span>
+        <span class="cue">Control eccentric</span>
+        <span class="cue">Hips stay down</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="lower" data-name="calf raise">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/-M4-G8p8fmc" loading="lazy" allowfullscreen title="Calf Raise"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Calf Raise</span>
+        <span class="tag tag-lower">Lower</span>
+      </div>
+      <p class="card-notes">80 kg × 3×10</p>
+      <div class="card-cues">
+        <span class="cue">Full stretch at bottom</span>
+        <span class="cue">Pause at top</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PUSH -->
+  <div class="card" data-category="push" data-name="incline dumbbell press bench">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/8iPEnn-ltC8" loading="lazy" allowfullscreen title="Incline Dumbbell Press"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Incline Dumbbell Press</span>
+        <span class="tag tag-push">Push</span>
+      </div>
+      <p class="card-notes">Upper chest. 15 kg × 3×10</p>
+      <div class="card-cues">
+        <span class="cue">30–45° incline</span>
+        <span class="cue">Elbows at 45°</span>
+        <span class="cue">Full stretch</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="push" data-name="barbell bench press">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/rT7DgCr-3pg" loading="lazy" allowfullscreen title="Barbell Bench Press"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Barbell Bench Press</span>
+        <span class="tag tag-push">Push</span>
+      </div>
+      <p class="card-notes">Horizontal push. 50 kg × 4×8</p>
+      <div class="card-cues">
+        <span class="cue">Arch upper back</span>
+        <span class="cue">Feet flat on floor</span>
+        <span class="cue">Bar to lower chest</span>
+        <span class="cue">Drive through heels</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PULL -->
+  <div class="card" data-category="pull" data-name="lat pulldown">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/CAwf7n6Luuc" loading="lazy" allowfullscreen title="Lat Pulldown"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Lat Pulldown</span>
+        <span class="tag tag-pull">Pull</span>
+      </div>
+      <p class="card-notes">52 kg × 3×10</p>
+      <div class="card-cues">
+        <span class="cue">Lead with elbows</span>
+        <span class="cue">Slight lean back</span>
+        <span class="cue">Squeeze lats at bottom</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="pull" data-name="cable row seated">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/GZbfZ033f74" loading="lazy" allowfullscreen title="Cable Row"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Cable Row</span>
+        <span class="tag tag-pull">Pull</span>
+      </div>
+      <p class="card-notes">Posture key. 52 kg × 3×12</p>
+      <div class="card-cues">
+        <span class="cue">Chest proud</span>
+        <span class="cue">Elbows close to body</span>
+        <span class="cue">Squeeze scapula</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="pull" data-name="pull-up pullup">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/eGo4IYlbE5g" loading="lazy" allowfullscreen title="Pull-up"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Pull-up</span>
+        <span class="tag tag-pull">Pull</span>
+      </div>
+      <p class="card-notes">Bodyweight × 4×10</p>
+      <div class="card-cues">
+        <span class="cue">Dead hang start</span>
+        <span class="cue">Lead with chest</span>
+        <span class="cue">Full extension</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOULDERS -->
+  <div class="card" data-category="shoulder" data-name="overhead press shoulder press">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/2yjwXTZQDDI" loading="lazy" allowfullscreen title="Shoulder Press"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Shoulder Press (DB)</span>
+        <span class="tag tag-shoulder">Shoulder</span>
+      </div>
+      <p class="card-notes">Priority lift. 15 kg × 4×8</p>
+      <div class="card-cues">
+        <span class="cue">Elbows at 90°</span>
+        <span class="cue">No excessive lean</span>
+        <span class="cue">Full lockout</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="shoulder" data-name="lateral raise side">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/3VcKaXpzqRo" loading="lazy" allowfullscreen title="Lateral Raise"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Lateral Raise</span>
+        <span class="tag tag-shoulder">Shoulder</span>
+      </div>
+      <p class="card-notes">Medial delt. 7 kg × 4×12</p>
+      <div class="card-cues">
+        <span class="cue">Slight forward lean</span>
+        <span class="cue">Pinky up at top</span>
+        <span class="cue">Slow eccentric</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE -->
+  <div class="card" data-category="core" data-name="crunch cable">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/ToR0C1xh01Y" loading="lazy" allowfullscreen title="Crunch"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Crunch (weighted)</span>
+        <span class="tag tag-core">Core</span>
+      </div>
+      <p class="card-notes">5 kg × 3×15-20</p>
+      <div class="card-cues">
+        <span class="cue">Round lower back</span>
+        <span class="cue">Exhale on contraction</span>
+        <span class="cue">No neck pull</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="core" data-name="reverse hyper hyperextension">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/o-7fU1nnGVQ" loading="lazy" allowfullscreen title="Reverse Hyper"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Reverse Hyper</span>
+        <span class="tag tag-core">Core</span>
+      </div>
+      <p class="card-notes">Lower back health. 15 kg × 3×12</p>
+      <div class="card-cues">
+        <span class="cue">Controlled swing</span>
+        <span class="cue">Squeeze glutes at top</span>
+        <span class="cue">No hyperextend at top</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="core" data-name="leg raises hanging">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/JB2oyawG9KI" loading="lazy" allowfullscreen title="Leg Raises"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Leg Raises</span>
+        <span class="tag tag-core">Core</span>
+      </div>
+      <p class="card-notes">Hip flexors & lower abs. 3×15</p>
+      <div class="card-cues">
+        <span class="cue">Posterior pelvic tilt</span>
+        <span class="cue">Slow lower</span>
+        <span class="cue">Don't swing</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-category="core" data-name="dead bug">
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/4XLEnwUr1d8" loading="lazy" allowfullscreen title="Dead Bug"></iframe>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <span class="card-title">Dead Bug</span>
+        <span class="tag tag-core">Core</span>
+      </div>
+      <p class="card-notes">Anti-extension core. 3×10/side</p>
+      <div class="card-cues">
+        <span class="cue">Lower back pressed down</span>
+        <span class="cue">Breathe out while lowering</span>
+        <span class="cue">Slow & controlled</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let activeFilter = 'all';
+
+function setFilter(cat, btn) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
+
+function filterCards() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    const matchCat = activeFilter === 'all' || card.dataset.category === activeFilter;
+    const matchSearch = card.dataset.name.includes(q) || card.querySelector('.card-title').textContent.toLowerCase().includes(q);
+    card.classList.toggle('hidden', !(matchCat && matchSearch));
+  });
+}
+</script>
+
+</body>
+</html>
